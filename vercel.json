@@ -1,4 +1,11 @@
 {
+  "functions": {
+    "api/procuradoria.py": { "runtime": "vercel-python@0.0.0" },
+    "api/magistratura.py": { "runtime": "vercel-python@0.0.0" },
+    "api/promotoria.py":   { "runtime": "vercel-python@0.0.0" },
+    "api/defensoria.py":   { "runtime": "vercel-python@0.0.0" },
+    "api/delegado.py":     { "runtime": "vercel-python@0.0.0" }
+  },
   "rewrites": [
     { "source": "/", "destination": "/index.html" }
   ]
