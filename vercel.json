@@ -2,5 +2,10 @@
   "framework": null,
   "rewrites": [
     { "source": "/", "destination": "/index.html" }
-  ]
+  ],
+  "functions": {
+    "api/*.py": {
+      "runtime": "vercel-python@0.0.0"
+    }
+  }
 }
