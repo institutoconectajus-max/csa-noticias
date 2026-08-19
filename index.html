@@ -177,7 +177,7 @@ function renderItems(items, cat){
         <span class="card-date">${formatDate(a.date)}</span>
       </div>
       <p class="card-title">${esc(a.title)}</p>
-      ${a.excerpt ? `<p class="card-excerpt">${esc(a.excerpt)}</p>` : ''}
+      ${a.resumo ? `<p class="card-excerpt">${esc(a.resumo)}</p>` : ''}
       ${a.source  ? `<p class="card-source">Fonte: ${esc(a.source)}</p>` : ''}
     </div>`).join('');
 }

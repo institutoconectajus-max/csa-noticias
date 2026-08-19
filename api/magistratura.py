@@ -1,4 +1,4 @@
-import time, json, requests
+import time, json, re, os, requests
 import xml.etree.ElementTree as ET
 from http.server import BaseHTTPRequestHandler
 
@@ -12,62 +12,62 @@ FEEDS = [
     ("Gran Cursos Online",             "https://www.grancursosonline.com.br/blog/feed/"),
 ]
 
-CARREIRAS = ["magistratura", "juiz", "juíza", "tribunal", "tjsp", "tjrj", "tjmg", "tjpr", "tjrs", "tjba", "tjpe", "tjsc", "trf", "stj", "stf"]
+CARREIRAS = ["magistratura", "juiz", "juíza", "tribunal", "tjsp", "tjrj", "tjmg", "tjpr", "tjrs", "trf", "stj"]
+EVENTOS   = ["edital", "banca", "gabarito", "resultado", "regulamento", "concurso",
+             "inscrição", "prova", "aprovado", "nomeação", "previsão", "vagas", "certame"]
 
-EVENTOS = [
-    "edital", "banca", "gabarito", "resultado", "regulamento",
-    "concurso", "inscrição", "prova", "aprovado", "nomeação",
-    "previsão", "previsto", "vagas", "seleção", "certame",
-]
+HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+GEMINI_KEY = os.environ.get("GEMINI_API_KEY", "")
+GEMINI_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key={GEMINI_KEY}"
+
+def clean(text):
+    return re.sub(r"<[^>]+>", "", text or "").strip()
 
 def relevante(text):
     t = text.lower()
     return any(c in t for c in CARREIRAS) and any(e in t for e in EVENTOS)
 
-def parse_feed(source_name, url):
+def resumir(title, excerpt):
+    if not GEMINI_KEY:
+        return excerpt[:200] if excerpt else ""
     try:
-        r = requests.get(url, headers={"User-Agent": "Mozilla/5.0"}, timeout=10)
-        r.raise_for_status()
-        root = ET.fromstring(r.content)
+        prompt = (
+            f"Resuma em 2 frases objetivas em português a seguinte notícia de concurso público jurídico. "
+            f"Seja direto, sem introdução. Título: {title}. Texto: {excerpt[:800]}"
+        )
+        r = requests.post(GEMINI_URL, json={
+            "contents": [{"parts": [{"text": prompt}]}],
+            "generationConfig": {"maxOutputTokens": 120, "temperature": 0.2}
+        }, timeout=8)
+        resp = r.json()
+        return resp["candidates"][0]["content"]["parts"][0]["text"].strip()
     except Exception:
-        return []
-    
-    items = []
-    for item in root.findall(".//item"):
-        title   = (item.find("title").text   or "").strip()
-        excerpt = (item.find("description").text or "").strip()
-        date    = (item.find("pubDate").text  or "").strip()
-        
-        # Limpa HTML do excerpt se houver
-        import re
-        excerpt = re.sub(r"<[^>]+>", "", excerpt)[:200].strip()
-        
-        if not title or not relevante(title + " " + excerpt):
-            continue
-        
-        items.append({
-            "title":   title,
-            "excerpt": excerpt,
-            "date":    date[:16] if date else "",
-            "source":  source_name,
-        })
-    return items
+        return excerpt[:200] if excerpt else ""
 
 def fetch_news(limit=20):
     now = time.time()
     cached = _cache.get(CATEGORY)
     if cached and (now - cached[0]) < CACHE_TTL:
         return cached[1][:limit]
-    
+
     all_items = []
     seen = set()
-    for name, url in FEEDS:
-        for item in parse_feed(name, url):
-            if item["title"] not in seen:
-                seen.add(item["title"])
-                all_items.append(item)
-    
-    # Ordena por data (mais recente primeiro)
+    for source_name, url in FEEDS:
+        try:
+            r = requests.get(url, headers=HEADERS, timeout=10)
+            root = ET.fromstring(r.content)
+        except Exception:
+            continue
+        for item in root.findall(".//item"):
+            title   = clean(item.find("title").text if item.find("title") is not None else "")
+            excerpt = clean(item.find("description").text if item.find("description") is not None else "")
+            date    = (item.find("pubDate").text or "")[:16].strip()
+            if not title or title in seen: continue
+            if not relevante(title + " " + excerpt): continue
+            seen.add(title)
+            resumo = resumir(title, excerpt)
+            all_items.append({"title": title, "resumo": resumo, "date": date, "source": source_name})
+
     all_items.sort(key=lambda x: x["date"], reverse=True)
     _cache[CATEGORY] = (now, all_items)
     return all_items[:limit]
@@ -75,12 +75,8 @@ def fetch_news(limit=20):
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
         news = fetch_news()
-        data = json.dumps({
-            "category": CATEGORY,
-            "label":    LABEL,
-            "count":    len(news),
-            "items":    news,
-        }, ensure_ascii=False).encode("utf-8")
+        data = json.dumps({"category": CATEGORY, "label": LABEL, "count": len(news), "items": news},
+                          ensure_ascii=False).encode("utf-8")
         self.send_response(200)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Access-Control-Allow-Origin", "*")
