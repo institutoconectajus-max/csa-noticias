@@ -29,7 +29,7 @@ def resumir(title, excerpt):
     key = os.environ.get("GEMINI_API_KEY", "")
     if not key:
         return excerpt[:200] if excerpt else ""
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key={key}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key={key}"
     try:
         prompt = (
             f"Resuma em 2 frases objetivas em português esta notícia de concurso público jurídico. "
