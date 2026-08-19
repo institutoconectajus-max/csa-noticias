@@ -1,6 +1,6 @@
 {
   "rewrites": [
     { "source": "/api/:category", "destination": "/api/[category]" },
-    { "source": "/",              "destination": "/index.html"      }
+    { "source": "/", "destination": "/index.html" }
   ]
 }
