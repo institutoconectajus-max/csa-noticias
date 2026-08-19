@@ -26,15 +26,10 @@ def fetch_articles(limit=12):
         if not title_el: continue
         title = title_el.get_text(strip=True)
         if not title: continue
-        date_el    = item.select_one(".meta-date")
-        img_el     = item.select_one("img")
-        excerpt_el = item.select_one(".entry-excerpt")
-        articles.append({
-            "title":   title,
-            "date":    date_el.get_text(strip=True) if date_el else "",
-            "thumb":   (img_el.get("src") or img_el.get("data-src") or "") if img_el else "",
-            "excerpt": excerpt_el.get_text(strip=True)[:220] if excerpt_el else "",
-        })
+        date_el = item.select_one(".meta-date")
+        date = date_el.get_text(strip=True) if date_el else ""
+        date = date.replace("Publicado em ", "").replace("Atualizado em ", "")
+        articles.append({"title": title, "date": date})
     _cache[CATEGORY] = (now, articles)
     return articles[:limit]
 
