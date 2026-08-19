@@ -10,7 +10,7 @@
   --bg:#0d0f14;--surface:#15181f;--card:#1c2029;
   --border:rgba(255,255,255,0.07);--border-hi:rgba(255,255,255,0.14);
   --accent:#e8a84c;--accent-dim:rgba(232,168,76,0.10);
-  --text:#f0ede8;--muted:#8a8d96;--muted2:#545760;
+  --text:#f0ede8;--muted:#8a8d96;--muted2:#545760;--muted3:#363a45;
   --radius:12px;--radius-sm:7px;
   --ff-title:'Sora',sans-serif;--ff-body:'DM Sans',sans-serif;
 }
@@ -18,13 +18,7 @@
 #csa-noticias{background:var(--bg);color:var(--text);font-family:var(--ff-body);min-height:100vh;}
 
 /* Nav */
-.csa-nav{
-  position:sticky;top:0;z-index:100;
-  background:rgba(13,15,20,.92);backdrop-filter:blur(12px);
-  border-bottom:1px solid var(--border);
-  padding:0 40px;height:64px;
-  display:flex;align-items:center;justify-content:space-between;
-}
+.csa-nav{position:sticky;top:0;z-index:100;background:rgba(13,15,20,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 40px;height:64px;display:flex;align-items:center;justify-content:space-between;}
 .nav-logo{font-family:var(--ff-title);font-weight:800;font-size:1.1rem;color:var(--text);text-decoration:none;letter-spacing:-.02em;display:flex;align-items:center;gap:10px;}
 .nav-logo span{color:var(--accent);}
 .nav-badge{font-size:.65rem;font-weight:700;font-family:var(--ff-title);background:var(--accent-dim);color:var(--accent);border:1px solid rgba(232,168,76,.25);padding:3px 9px;border-radius:100px;letter-spacing:.04em;text-transform:uppercase;}
@@ -43,37 +37,34 @@
 /* Tabs */
 .tabs-wrap{max-width:1100px;margin:0 auto;padding:32px 40px 0;}
 .tabs-row{display:flex;gap:8px;flex-wrap:wrap;border-bottom:1px solid var(--border);}
-.tab-btn{
-  font-family:var(--ff-title);font-weight:600;font-size:.75rem;letter-spacing:.05em;text-transform:uppercase;
-  padding:11px 20px;border-radius:var(--radius-sm) var(--radius-sm) 0 0;
-  border:1px solid transparent;border-bottom:none;
-  background:transparent;color:var(--muted);cursor:pointer;transition:all .18s;
-  position:relative;bottom:-1px;display:flex;align-items:center;gap:7px;
-}
+.tab-btn{font-family:var(--ff-title);font-weight:600;font-size:.75rem;letter-spacing:.05em;text-transform:uppercase;padding:11px 20px;border-radius:var(--radius-sm) var(--radius-sm) 0 0;border:1px solid transparent;border-bottom:none;background:transparent;color:var(--muted);cursor:pointer;transition:all .18s;position:relative;bottom:-1px;display:flex;align-items:center;gap:7px;}
 .tab-btn .dot{width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.4;transition:opacity .18s;}
 .tab-btn:hover{color:var(--text);background:var(--surface);}
 .tab-btn.active{color:var(--accent);background:var(--bg);border-color:var(--border);border-bottom-color:var(--bg);}
 .tab-btn.active .dot{opacity:1;}
 
-/* Grid */
+/* Lista de notícias */
 .content-wrap{max-width:1100px;margin:0 auto;padding:28px 40px 72px;}
-.news-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1px;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+.news-list{display:flex;flex-direction:column;gap:1px;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
 
 /* Card */
 .news-card{
   background:var(--card);
-  padding:20px 22px;
-  display:flex;flex-direction:column;gap:10px;
+  padding:20px 24px;
+  display:flex;flex-direction:column;gap:8px;
   transition:background .15s;
-  border-right:1px solid var(--border);
   border-bottom:1px solid var(--border);
 }
+.news-card:last-child{border-bottom:none;}
 .news-card:hover{background:#222636;}
 
-.card-cat{font-family:var(--ff-title);font-size:.62rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;gap:5px;}
+.card-top{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.card-cat{font-family:var(--ff-title);font-size:.62rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;gap:5px;flex-shrink:0;}
 .card-cat-dot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0;}
-.card-title{font-family:var(--ff-title)!important;color:var(--text)!important;font-size:.88rem;font-weight:600!important;line-height:1.5;}
-.card-date{font-size:.68rem;color:var(--muted2);font-family:var(--ff-title);margin-top:auto;}
+.card-date{font-size:.68rem;color:var(--muted2);font-family:var(--ff-title);white-space:nowrap;}
+.card-title{font-family:var(--ff-title)!important;color:var(--text)!important;font-size:.9rem;font-weight:600!important;line-height:1.5;}
+.card-excerpt{font-size:.82rem;color:var(--muted);line-height:1.6;}
+.card-source{font-size:.68rem;color:var(--muted3);font-family:var(--ff-title);margin-top:2px;}
 
 /* Cores por carreira */
 .cat-procuradoria{color:#e8a84c;}
@@ -82,8 +73,8 @@
 .cat-defensoria{color:#34d399;}
 .cat-delegado{color:#f87171;}
 
-/* Estados */
-.state-box{grid-column:1/-1;padding:80px 0;text-align:center;color:var(--muted);font-family:var(--ff-title);}
+/* Estado vazio */
+.state-box{padding:80px 0;text-align:center;color:var(--muted);font-family:var(--ff-title);background:var(--card);}
 .state-box p{font-size:.88rem;margin-top:12px;}
 @keyframes spin{to{transform:rotate(360deg)}}
 .spinner{width:32px;height:32px;border-radius:50%;border:3px solid var(--border-hi);border-top-color:var(--accent);animation:spin .8s linear infinite;margin:0 auto;}
@@ -98,10 +89,10 @@
 @media(max-width:768px){
   .csa-nav{padding:0 20px;}
   .page-header{padding:36px 20px 28px;}
-  .tabs-wrap{padding:24px 20px 0;}
+  .tabs-wrap,.content-wrap{padding-left:20px;padding-right:20px;}
   .tab-btn{padding:9px 13px;font-size:.68rem;}
-  .content-wrap{padding:24px 20px 48px;}
-  .news-grid{grid-template-columns:1fr;}
+  .content-wrap{padding-top:20px;padding-bottom:48px;}
+  .card-top{flex-wrap:wrap;}
 }
 </style>
 </head>
@@ -109,16 +100,13 @@
 <div id="csa-noticias">
 
 <nav class="csa-nav">
-  <a href="https://csaconcurso.com.br" class="nav-logo">
-    CSA <span>concursos</span>
-    <span class="nav-badge">Notícias</span>
-  </a>
+  <a href="https://csaconcurso.com.br" class="nav-logo">CSA <span>concursos</span><span class="nav-badge">Notícias</span></a>
   <a href="https://csaconcurso.com.br/csapremium/" class="nav-cta" target="_blank" rel="noopener">Conhecer o CSA Premium →</a>
 </nav>
 
 <header class="page-header">
   <h1>Notícias das <span>Carreiras Jurídicas</span></h1>
-  <p>Editais, concursos e novidades de Procuradoria, Magistratura, MP, Defensoria e Delegado.</p>
+  <p>Editais, bancas, gabaritos e resultados de Procuradoria, Magistratura, MP, Defensoria e Delegado.</p>
   <div class="update-badge"><span class="pulse"></span>Atualizado a cada hora</div>
 </header>
 
@@ -133,7 +121,7 @@
 </div>
 
 <main class="content-wrap">
-  <div class="news-grid" id="grid"></div>
+  <div class="news-list" id="list"></div>
 </main>
 
 <footer class="csa-footer">
@@ -155,7 +143,7 @@ const CATS = {
 };
 const cache = {};
 
-function switchCat(btn) {
+function switchCat(btn){
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   loadNews(btn.dataset.cat);
@@ -163,31 +151,49 @@ function switchCat(btn) {
 
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-function renderLoading(){
-  document.getElementById('grid').innerHTML='<div class="state-box"><div class="spinner"></div><p>Carregando...</p></div>';
+function formatDate(d){
+  if (!d) return '';
+  const m = d.match(/(\d{1,2})\s+(\w+)\s+(\d{4})/);
+  if (m) return `${m[1]} ${m[2].slice(0,3)} ${m[3]}`;
+  // pubDate RSS: "Tue, 19 Aug 2026 10:00:00 +0000"
+  try { return new Date(d).toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'}); }
+  catch { return d.slice(0,16); }
 }
 
-function renderArticles(articles, cat){
+function renderLoading(){
+  document.getElementById('list').innerHTML='<div class="state-box"><div class="spinner"></div><p>Carregando notícias...</p></div>';
+}
+
+function renderItems(items, cat){
   const c = CATS[cat];
-  if (!articles?.length){ document.getElementById('grid').innerHTML='<div class="state-box"><p>Nenhuma notícia encontrada.</p></div>'; return; }
-  document.getElementById('grid').innerHTML = articles.map(a => `
+  if (!items?.length){
+    document.getElementById('list').innerHTML='<div class="state-box"><p>Nenhuma notícia encontrada no momento.</p></div>';
+    return;
+  }
+  document.getElementById('list').innerHTML = items.map(a => `
     <div class="news-card">
-      <div class="card-cat ${c.cls}"><span class="card-cat-dot"></span>${c.label}</div>
+      <div class="card-top">
+        <div class="card-cat ${c.cls}"><span class="card-cat-dot"></span>${c.label}</div>
+        <span class="card-date">${formatDate(a.date)}</span>
+      </div>
       <p class="card-title">${esc(a.title)}</p>
-      ${a.date ? `<p class="card-date">${esc(a.date)}</p>` : ''}
+      ${a.excerpt ? `<p class="card-excerpt">${esc(a.excerpt)}</p>` : ''}
+      ${a.source  ? `<p class="card-source">Fonte: ${esc(a.source)}</p>` : ''}
     </div>`).join('');
 }
 
 async function loadNews(cat){
-  if (cache[cat]){ renderArticles(cache[cat], cat); return; }
+  if (cache[cat]){ renderItems(cache[cat], cat); return; }
   renderLoading();
   try{
-    const res = await fetch(`/api/${cat}`, { signal: AbortSignal.timeout(12000) });
+    const res = await fetch(`/api/${cat}`, { signal: AbortSignal.timeout(15000) });
     if (!res.ok) throw new Error();
     const data = await res.json();
-    cache[cat] = data.articles;
-    renderArticles(data.articles, cat);
-  } catch{ document.getElementById('grid').innerHTML='<div class="state-box"><p>Não foi possível carregar agora. Tente novamente em instantes.</p></div>'; }
+    cache[cat] = data.items;
+    renderItems(data.items, cat);
+  } catch{
+    document.getElementById('list').innerHTML='<div class="state-box"><p>Não foi possível carregar agora. Tente novamente em instantes.</p></div>';
+  }
 }
 
 loadNews('procuradoria');
