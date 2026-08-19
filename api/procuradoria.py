@@ -22,18 +22,18 @@ def fetch_articles(limit=12):
     articles = []
     for item in soup.select("article"):
         if len(articles) >= 12: break
-        title_el = item.select_one(".entry-title a, h2 a, h3 a")
+        title_el = item.select_one(".entry-title a")
         if not title_el: continue
         title = title_el.get_text(strip=True)
         if not title: continue
-        date_el    = item.select_one("time.entry-date, .entry-date, time")
+        date_el    = item.select_one(".meta-date")
         img_el     = item.select_one("img")
-        excerpt_el = item.select_one(".entry-summary p, .entry-content p")
+        excerpt_el = item.select_one(".entry-excerpt")
         articles.append({
             "title":   title,
             "date":    date_el.get_text(strip=True) if date_el else "",
             "thumb":   (img_el.get("src") or img_el.get("data-src") or "") if img_el else "",
-            "excerpt": excerpt_el.get_text(strip=True)[:200] if excerpt_el else "",
+            "excerpt": excerpt_el.get_text(strip=True)[:220] if excerpt_el else "",
         })
     _cache[CATEGORY] = (now, articles)
     return articles[:limit]
