@@ -64,7 +64,10 @@
 .card-date{font-size:.68rem;color:var(--muted2);font-family:var(--ff-title);white-space:nowrap;}
 .card-title{font-family:var(--ff-title)!important;color:var(--text)!important;font-size:.9rem;font-weight:600!important;line-height:1.5;}
 .card-excerpt{font-size:.82rem;color:var(--muted);line-height:1.6;}
-.card-source{font-size:.68rem;color:var(--muted3);font-family:var(--ff-title);margin-top:2px;}
+.card-source{font-size:.68rem;color:var(--muted2);font-family:var(--ff-title);}
+.card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:8px;gap:12px;}
+.card-link{font-size:.72rem;font-family:var(--ff-title);font-weight:600;color:var(--accent);text-decoration:none;white-space:nowrap;flex-shrink:0;}
+.card-link:hover{text-decoration:underline;}
 
 /* Cores por carreira */
 .cat-procuradoria{color:#e8a84c;}
@@ -171,14 +174,17 @@ function renderItems(items, cat){
     return;
   }
   document.getElementById('list').innerHTML = items.map(a => `
-    <div class="news-card">
+    <div class="news-card${a.link ? ' has-link' : ''}">
       <div class="card-top">
         <div class="card-cat ${c.cls}"><span class="card-cat-dot"></span>${c.label}</div>
         <span class="card-date">${formatDate(a.date)}</span>
       </div>
       <p class="card-title">${esc(a.title)}</p>
       ${a.resumo ? `<p class="card-excerpt">${esc(a.resumo)}</p>` : ''}
-      ${a.source  ? `<p class="card-source">Fonte: ${esc(a.source)}</p>` : ''}
+      <div class="card-footer">
+        ${a.source ? `<p class="card-source">Fonte: ${esc(a.source)}</p>` : ''}
+        ${a.link   ? `<a class="card-link" href="${esc(a.link)}" target="_blank" rel="noopener">Ler na íntegra →</a>` : ''}
+      </div>
     </div>`).join('');
 }
 

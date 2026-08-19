@@ -4,7 +4,7 @@ from http.server import BaseHTTPRequestHandler
 
 CATEGORY  = "procuradoria"
 LABEL     = "Procuradoria"
-CACHE_TTL = 3600
+CACHE_TTL = 86400  # 24 horas
 _cache    = {}
 
 FEEDS = [
@@ -63,12 +63,13 @@ def fetch_news(limit=20):
         for item in root.findall(".//item"):
             title   = clean(item.find("title").text if item.find("title") is not None else "")
             excerpt = clean(item.find("description").text if item.find("description") is not None else "")
+            link    = (item.find("link").text or "").strip() if item.find("link") is not None else ""
             date    = (item.find("pubDate").text or "")[:16].strip()
             if not title or title in seen: continue
             if not relevante(title + " " + excerpt): continue
             seen.add(title)
             resumo = resumir(title, excerpt)
-            all_items.append({"title": title, "resumo": resumo, "date": date, "source": source_name})
+            all_items.append({"title": title, "resumo": resumo, "link": link, "date": date, "source": source_name})
 
     all_items.sort(key=lambda x: x["date"], reverse=True)
     _cache[CATEGORY] = (now, all_items)
@@ -82,7 +83,7 @@ class handler(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Cache-Control", "s-maxage=3600, stale-while-revalidate=86400")
+        self.send_header("Cache-Control", "s-maxage=86400, stale-while-revalidate=3600")
         self.end_headers()
         self.wfile.write(data)
     def do_OPTIONS(self):
