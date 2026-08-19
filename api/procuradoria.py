@@ -4,7 +4,7 @@ from http.server import BaseHTTPRequestHandler
 
 CATEGORY = "procuradoria"
 LABEL    = "Procuradoria"
-CACHE_TTL = 3600
+CACHE_TTL = 1
 _cache = {}
 
 FEEDS = [
@@ -17,7 +17,7 @@ EVENTOS   = ["edital", "banca", "gabarito", "resultado", "regulamento", "concurs
              "inscrição", "prova", "aprovado", "nomeação", "previsão", "vagas", "certame"]
 
 HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
-GEMINI_KEY = os.environ.get("GEMINI_API_KEY", "")
+GEMINI_KEY = os.environ.get("GEMINI_API_KEY", os.environ.get("GEMINI_API_KEY_VERCEL", ""))
 GEMINI_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key={GEMINI_KEY}"
 
 def clean(text):
