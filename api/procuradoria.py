@@ -4,7 +4,7 @@ from http.server import BaseHTTPRequestHandler
 
 CATEGORY  = "procuradoria"
 LABEL     = "Procuradoria"
-CACHE_TTL = 1  # temporário para debug
+CACHE_TTL = 3600
 _cache    = {}
 
 FEEDS = [
@@ -18,9 +18,6 @@ EVENTOS   = ["edital", "banca", "gabarito", "resultado", "regulamento", "concurs
 
 HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
 
-def get_gemini_key():
-    return os.environ.get("GEMINI_API_KEY", "")
-
 def clean(text):
     return re.sub(r"<[^>]+>", "", text or "").strip()
 
@@ -29,10 +26,10 @@ def relevante(text):
     return any(c in t for c in CARREIRAS) and any(e in t for e in EVENTOS)
 
 def resumir(title, excerpt):
-    key = get_gemini_key()
+    key = os.environ.get("GEMINI_API_KEY", "")
     if not key:
-        return "[SEM_KEY] " + (excerpt[:150] if excerpt else "")
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key={key}"
+        return excerpt[:200] if excerpt else ""
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key={key}"
     try:
         prompt = (
             f"Resuma em 2 frases objetivas em português esta notícia de concurso público jurídico. "
@@ -45,9 +42,9 @@ def resumir(title, excerpt):
         resp = r.json()
         if "candidates" in resp:
             return resp["candidates"][0]["content"]["parts"][0]["text"].strip()
-        return "[ERRO_API] " + str(resp)[:100]
-    except Exception as e:
-        return f"[EXCECAO] {str(e)[:100]}"
+        return excerpt[:200] if excerpt else ""
+    except Exception:
+        return excerpt[:200] if excerpt else ""
 
 def fetch_news(limit=20):
     now = time.time()
@@ -72,7 +69,6 @@ def fetch_news(limit=20):
             seen.add(title)
             resumo = resumir(title, excerpt)
             all_items.append({"title": title, "resumo": resumo, "date": date, "source": source_name})
-            break  # só 1 item para debug rápido
 
     all_items.sort(key=lambda x: x["date"], reverse=True)
     _cache[CATEGORY] = (now, all_items)
@@ -81,16 +77,12 @@ def fetch_news(limit=20):
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
         news = fetch_news()
-        data = json.dumps({
-            "category": CATEGORY,
-            "label": LABEL,
-            "count": len(news),
-            "gemini_key_present": bool(get_gemini_key()),
-            "items": news,
-        }, ensure_ascii=False).encode("utf-8")
+        data = json.dumps({"category": CATEGORY, "label": LABEL, "count": len(news), "items": news},
+                          ensure_ascii=False).encode("utf-8")
         self.send_response(200)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Cache-Control", "s-maxage=3600, stale-while-revalidate=86400")
         self.end_headers()
         self.wfile.write(data)
     def do_OPTIONS(self):
