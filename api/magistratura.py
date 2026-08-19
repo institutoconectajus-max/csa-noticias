@@ -25,16 +25,15 @@ def fetch_articles(limit=12):
         title_el = item.select_one(".entry-title a, h2 a, h3 a")
         if not title_el: continue
         title = title_el.get_text(strip=True)
-        link  = title_el.get("href", "")
-        if not title or not link: continue
+        if not title: continue
         date_el    = item.select_one("time.entry-date, .entry-date, time")
         img_el     = item.select_one("img")
         excerpt_el = item.select_one(".entry-summary p, .entry-content p")
         articles.append({
-            "title":   title, "link": link,
+            "title":   title,
             "date":    date_el.get_text(strip=True) if date_el else "",
             "thumb":   (img_el.get("src") or img_el.get("data-src") or "") if img_el else "",
-            "excerpt": excerpt_el.get_text(strip=True)[:160] if excerpt_el else "",
+            "excerpt": excerpt_el.get_text(strip=True)[:200] if excerpt_el else "",
         })
     _cache[CATEGORY] = (now, articles)
     return articles[:limit]
@@ -42,7 +41,7 @@ def fetch_articles(limit=12):
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
         articles = fetch_articles()
-        data = json.dumps({"category": CATEGORY, "source": URL, "count": len(articles), "articles": articles}, ensure_ascii=False).encode("utf-8")
+        data = json.dumps({"category": CATEGORY, "count": len(articles), "articles": articles}, ensure_ascii=False).encode("utf-8")
         self.send_response(200)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Access-Control-Allow-Origin", "*")
